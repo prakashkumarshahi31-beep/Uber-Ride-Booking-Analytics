@@ -1,0 +1,125 @@
+-- UBER RIDE ANALYTICS PROJECT
+
+create database uber;
+use uber;
+
+select * from akashuber;
+
+-- Topic Basic Sql Queries
+
+-- Q. DISPLAY THE FIRST 10 RECORDS 
+
+select *
+from akashuber
+limit 10;
+
+-- Q FIND UNIQUE PICKUP AND DROPOFF LOCATIONS
+select distinct pickup_location,drop_location
+from akashuber;
+
+
+-- Q FIND TRIPS WITH A DISTAANCE GREATER THAN 10 MILES
+select ride_distance
+from akashuber
+where ride_distance>10;
+
+-- Q FIND TRIPS WITH FARES B/W $20 AND @50
+select booking_value
+from akashuber
+where booking_value between 20 and 50;
+
+
+-- TOPIC. AGGREGATE FUNCTION AND GROUPING
+
+-- Q CALCULATE TOTAL,AVERAGE,MINIMUM,MAXIMUM RIDE DISTANCE
+select sum(ride_distance) as sum,avg(ride_distance) as avg,min(ride_distance) as min,max(ride_distance) as max
+from akashuber;
+
+-- Q FIND NUMBER OF RIDE FROM EACH PICKUP LOCATION
+select pickup_location,count(ride_distance) as count
+from akashuber
+group by pickup_location;
+
+-- Q FIND PICKUP LOCATIONS WITH MORE THAN 2 RIDES
+select pickup_location,count(ride_distance) as count
+from akashuber
+group by pickup_location
+having count(ride_distance)>2;
+
+
+-- Q FIND AVERAGE DRIVER PAY BY PICKUP LOCATION
+select pickup_location ,avg(booking_value) as avg
+from akashuber
+group by pickup_location;
+
+
+-- TOPIC CONDITIONAL STATEMENT AND FILTERING
+
+-- Q CATEGORISE TRIPS ACCORDING TO DISTANCE
+select ride_distance,
+  (case when ride_distance <10 then 'short_distance' end) as short_distance,
+  (case when ride_distance between 11 and 25 then 'medium_distance' end) as medium_distance,
+  (case when ride_distance >25 then 'large_distance' end) as large_distance
+from akashuber;
+
+
+-- Q CLASSIFY TRIPS BY FARE AMOUNT
+select ride_distance,booking_value,
+  (case when ride_distance<10 and booking_value>100 then 'fare value' else 'unfare' end) as below_10km,
+  (case when ride_distance>25 and booking_value>300 then 'fare_value' else 'unfare' end) as greater_than_25
+from akashuber;
+  
+  
+-- Q FIND TOP 10 LONGEST TRIPS
+select  ride_distance
+from akashuber
+order by ride_distance desc
+limit 10;
+
+
+-- TOPIC SUBQUERIES
+
+-- Q FIND TRIPS WITH FARES HIGHER THAN THE AVERAGE FARE
+select ride_distance ,booking_value as fare
+from akashuber
+where booking_value>(
+  select avg(booking_value) as avg_fare
+  from akashuber
+);
+
+-- Q FIND PICKUP LOCATION WITH ABOVE AVERAGE RIDE DEMAND
+select pickup_location,ride_distance
+from akashuber
+where ride_distance>(
+  select avg(ride_distance)
+  from akashuber
+);
+
+-- Q FIND THE LONGEST TRIP FOR EACH PICKUP LOCATION
+select pickup_location,ride_distance
+from akashuber
+order by ride_distance desc;
+
+
+-- TOPIC WINDOW FUNCTION 
+
+-- Q RANK PICKUP LOCATION BY RIDE DEMAND
+select
+  pickup_location,
+  ride_distance,
+  rank() over(partition by pickup_location order by ride_distance) as pickup_location_rank
+from akashuber;
+
+-- Q COMPARE MONTHLY RIDES WITH THE PREVIOUS MONTH
+select
+  Date,
+  ride_distance,
+  lag(Date) over(partition by ride_distance order by Date asc) as comparison_monthly_rides
+from akashuber;
+
+-- Q FIND PICKUP LOCATION WITH TOTAL RIDES
+select
+  ride_distance,
+  pickup_location,
+  sum(ride_distance) over(partition by pickup_location order by ride_distance desc) as total_ride
+from akashuber;
