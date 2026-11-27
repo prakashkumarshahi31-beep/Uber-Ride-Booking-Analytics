@@ -1,0 +1,108 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+csv = pd.read_csv("C:\\Users\\praka\\Downloads\\datadrive\\Project 6\\ncr_ride_bookings.csv")
+print(csv)
+
+# 1.Monthly ride trends
+
+csv['Date'] = pd.to_datetime(csv['Date'])
+csv['year_month'] = csv['Date'].dt.to_period('M')
+monthly_rides = csv.groupby('year_month').size().reset_index(name='total_rides')
+
+print(monthly_rides)
+
+plt.figure(figsize=(12, 6))
+
+plt.plot(
+    monthly_rides['year_month'].astype(str),
+    monthly_rides['total_rides'],
+    marker='o'
+)
+
+plt.title('Monthly Uber Ride Trends')
+plt.xlabel('Month')
+plt.ylabel('Total Rides')
+plt.xticks(rotation=45)
+plt.grid(True)
+
+#plt.tight_layout()
+#plt.show()
+
+# 2.Rides By an Hour
+
+csv['Date'] = pd.to_datetime(csv['Date'])
+
+csv['pickup_hour'] = csv['Date'].dt.hour
+
+print(csv[['Date', 'pickup_hour']].head())
+
+hourly_rides = csv.groupby('pickup_hour').size().reset_index(name='total_rides')
+
+print(hourly_rides)
+
+plt.figure(figsize=(12, 6))
+
+plt.bar(hourly_rides['pickup_hour'], hourly_rides['total_rides'])
+
+plt.title('Uber Rides by Hour')
+plt.xlabel('Hour of the Day')
+plt.ylabel('Total Rides')
+
+plt.xticks(range(24))
+plt.grid(axis='y')
+
+plt.show()
+
+
+# 3.Trip Distance Distribution
+
+csv['Ride Distance'] = pd.to_numeric(csv['Ride Distance'], errors='coerce')
+
+df = csv.dropna(subset=['Ride Distance'])
+
+# Remove invalid distances
+csv = csv[csv['Ride Distance'] > 0]
+plt.figure(figsize=(10, 6))
+
+plt.hist(csv['Ride Distance'], bins=50, edgecolor='black')
+
+plt.title('Uber Trip Distance Distribution')
+plt.xlabel('Trip Distance (Miles)')
+plt.ylabel('Number of Rides')
+
+plt.grid(axis='y')
+plt.show()
+
+csv['distance_category'] = np.select(
+    [
+        csv['Ride Distance'] <= 2,
+        csv['Ride Distance'] <= 5,
+        csv['Ride Distance'] <= 10,
+        csv['Ride Distance'] > 10
+    ],
+    [
+        'Short Distance',
+        'Medium Distance',
+        'Long Distance',
+        'Very Long Distance'
+    ],
+    default='Unknown'
+)
+
+print(csv['distance_category'].value_counts())
+
+distance_counts = csv['distance_category'].value_counts()
+
+plt.figure(figsize=(10, 6))
+
+plt.bar(distance_counts.index, distance_counts.values)
+
+plt.title('Rides by Distance Category')
+plt.xlabel('Distance Category')
+plt.ylabel('Number of Rides')
+
+plt.xticks(rotation=20)
+plt.grid(axis='y')
+plt.show()
