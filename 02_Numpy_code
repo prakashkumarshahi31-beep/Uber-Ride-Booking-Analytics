@@ -1,0 +1,50 @@
+import pandas as pd
+import numpy as np
+
+csv = pd.read_csv("C:\\Users\\praka\\Downloads\\datadrive\\Project 6\\ncr_ride_bookings.csv")
+print(csv)
+
+# NUMPY NUMERICAL OPERATION
+
+#i. Average Operation
+print("Average Ride Distance:\n",np.mean(csv["Ride Distance"]))
+print("AVERAGE Booking Value:\n",np.mean(csv["Booking Value"]))
+print("Average Customer Rating:\n",np.mean(csv["Customer Rating"]))
+print("Average Driver Ratings:\n",np.mean(csv["Driver Ratings"]))
+
+#2. Fare variability
+print("Standard Ride Distance:\n",np.std(csv["Ride Distance"]))
+print("Standard Booking Value:\n",np.std(csv["Booking Value"]))
+print("Variance Ride Distance:\n",np.var(csv["Ride Distance"]))
+print("Variance Booking Value:\n",np.var(csv["Booking Value"]))
+
+#3. TOTAL VALUE
+print("TOTAL Booking Value:\n",np.sum(csv["Booking Value"]))
+print("TOTAL Ride Distance:\n",np.sum(csv["Ride Distance"]))
+
+# CLASSIFICATION
+result = np.where(csv["Booking Value"]>200)
+print(result)
+result = np.where(csv["Ride Distance"]>34)
+print(result)
+
+#df['trip_category'] = np.select(
+   # [
+ #       df['trip_distance'] <= 2,
+  #      df['trip_distance'] <= 10,
+   #    df['trip_distance'] > 10
+  #  ],
+ #   [
+  #      'Short Trip',
+   #     'Medium Trip',
+   #     'Long Trip'
+ #   ],
+  #  default='Unknown'
+#)
+
+# Transform highly skewed numerical variables(LOG)
+
+print("skewed numerical variable log2:\n",np.log2(csv["Ride Distance"]))
+print("skewed numerical variable log2:\n",np.log2(csv["Booking Value"]))
+print("skewed numerical variable log10:\n",np.log10(csv["Ride Distance"]))
+print("skewed numerical variable log10:\n",np.log10(csv["Booking Value"]))
