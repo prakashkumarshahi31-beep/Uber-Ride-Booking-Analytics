@@ -1,0 +1,61 @@
+import pandas as pd
+
+
+
+# DATA LOADING AND EXPLORATION USING PANDAS
+
+csv = pd.read_csv("C:\\Users\\praka\\Downloads\\datadrive\\Project 6\\ncr_ride_bookings.csv")
+print(csv)
+print("upper report of data:\n",csv.head())
+print("lower report of data:\n",csv.tail())
+print("shape of data:\n",csv.shape)
+print("describe data:\n",csv.describe())
+print("data type:\n",csv.dtypes)
+
+# HANDLING DUPLICATES RECORDS
+
+print("find duplicate data:\n",csv.duplicated())
+print("delete duplicates records:\n",csv.drop_duplicates())
+
+# DATA CLEANING
+print("find null value in data:\n",csv.isnull())
+print("fill null value in data:\n",csv.fillna("n/a"))
+print("find not null value in data:\n",csv.notnull())
+print("delete rows which contain null value:\n",csv.dropna())
+
+# OUTLIER DETECTION USING IQR
+
+q1 = csv["trip_distance"].quantile(0.25)
+q3 = csv["trip_distance"].quantile(0.75)
+
+iqr = q3 - q1
+
+lower = q1 - 1.5*iqr
+upper = q3 + 1.5*iqr
+
+outliers = csv[
+    3(csv["trip_distance"] < lower) | (csv["trip_distance"] > upper)
+]
+print(outliers)
+
+# EXPLORATORY DATA ANALYSIS
+
+#i.Ride demand by hour
+
+hourly_rides = csv.groupby("pickup_hours").size()
+print(hourly_rides.sort_values(ascending=False))
+
+#ii.Monthly ride trends
+monthly_rides = csv.groupby('pickup_month').size()
+
+print(monthly_rides)
+
+#iii.Average trip distance
+avg_distance = np.mean(csv['trip_distance'].dropna())
+
+print(avg_distance)
+
+#iv.Revenue analysis
+revenue_analysis = csv.groupby('pickup_hour')['fare_amount'].sum()
+
+print(revenue_analysis)
